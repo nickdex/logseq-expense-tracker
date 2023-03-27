@@ -3,7 +3,10 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ESNext", "DOM"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "moduleResolution": "Node",
     "strict": true,
     "resolveJsonModule": true,
@@ -15,7 +18,14 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
-    "sourceMap": true
+    "sourceMap": true,
   },
-  "include": ["src"]
+  "ts-node": {
+    "esm": true
+  },
+  "include": [
+    "src",
+    "test",
+    "script.ts"
+  ]
 }
