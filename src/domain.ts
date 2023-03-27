@@ -30,8 +30,10 @@ export interface FromAccount {
 }
 
 const capitalizeFirstLetter = (e: string): string => e.replace(/^\w/, (c) => c.toUpperCase())
+const escapeNewline = (s: string): string => s.replace(/\n/g, '\\n')
 
 export const toCamelCase = pipe(
+  escapeNewline,
   replace(/([\w\s-]+).*/, '$1'),
   match(/[a-zA-Z0-9]+/g),
   map(toLower),
