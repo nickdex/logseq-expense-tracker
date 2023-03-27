@@ -5,7 +5,7 @@ const url =
 
 export interface Payload {
   categories?: Category[]
-  fromAccount?: FromAccount[]
+  fromAccounts?: FromAccount[]
 }
 
 export const postRequest = async (body: Payload): Promise<any> => {

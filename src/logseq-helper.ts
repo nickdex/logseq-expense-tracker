@@ -1,10 +1,15 @@
 import { type BlockEntity } from '@logseq/libs/dist/LSPlugin.user'
+
+import { transformProperties, type Block } from './domain'
 import { cleanUpString } from './util'
 
-export const getChildren = (block: BlockEntity): string[] => {
-  const children = block.children as BlockEntity[]
+import { map } from 'ramda'
 
-  const childrenContent = children.map(({ content }) => cleanUpString(content))
+// step 5: perform complete transformation of a single block
+export const transformBlock = (block: BlockEntity): Block => ({
+  content: cleanUpString(block.content),
+  propertiesTextValues: transformProperties(block.propertiesTextValues)
+})
 
-  return childrenContent
-}
+// step 6: transform entire list of blocks
+export const toBlocks = map(transformBlock)

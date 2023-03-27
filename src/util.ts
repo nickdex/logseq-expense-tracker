@@ -1,4 +1,5 @@
 import { type BlockEntity } from '@logseq/libs/dist/LSPlugin'
+import * as R from 'ramda'
 
 const logLabel = 'expense-tracker'
 
@@ -17,6 +18,12 @@ export const getCurrentBlock = async (): Promise<BlockEntity | null> => {
   return await logseq.Editor.getBlock(block.uuid, { includeChildren: true })
 }
 
-export const cleanUpString = (str: string): string => {
-  return str.replace(/[^\w\s]/gi, '').replace(/\n$/, '')
+export const cleanUpString = R.compose(R.trim, R.replace(/\[\[|\]\]/g, ''))
+
+const toSnakeCase = (input: string): string => input.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()
+
+export const convertToSnakeCase = (input: string): string => {
+  const words = input.trim().split(/\s+/)
+  const snakeCasedWords = words.map(toSnakeCase)
+  return snakeCasedWords.join('_')
 }

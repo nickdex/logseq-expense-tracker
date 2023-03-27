@@ -1,10 +1,10 @@
 import '@logseq/libs'
-// import { postRequest, type Payload } from './api'
-import * as R from 'ramda'
-// import { getChildren } from './logseq-helper'
+import { type BlockEntity } from '@logseq/libs/dist/LSPlugin'
 
+import { postRequest, type Payload } from './api'
+import { isEquals, toCategories, toFromAccount } from './domain'
+import { toBlocks } from './logseq-helper'
 import { debug, error, getCurrentBlock } from './util'
-import { getData } from './domain'
 
 export const main = (): void => {
   logseq.Editor.registerSlashCommand('0 Test Plugin', async () => {
@@ -19,29 +19,38 @@ export const main = (): void => {
     }
 
     debug(`Parent ${block.content}`)
-    debug(`Children ${JSON.stringify(block.children)}`)
 
-    const isContentEquals = R.equals(block.content.toLowerCase())
-    // const getCategories = R.ifElse(isContentEquals, getCategoryData(block), undefined)
+    // Block
+    // get children
+    // from children clean and return content and propertiesTextValues
 
-    const getData1 = R.ifElse(isContentEquals, () => getData(block), R.always(undefined))
+    const x = toBlocks(block.children as BlockEntity[])
 
-    const x = getData1('category')
-    debug(x)
-    // const payload: Payload = {
-    //   categories: isContentEquals('category') ? getCategoryData(block) : undefined,
-    //   fromAccount: []
-    // }
+    // if category then return content
+    const c = toCategories(x.map((y) => y.content))
 
-    // await postRequest(payload)
-    //   .then(async ({ message }) => {
-    //     if (message !== 'Webhook trigger fired successfully') throw new Error(message)
-    //     await logseq.UI.showMsg('Data Posted successfully')
-    //   })
-    //   .catch(async (error) => {
-    //     console.error(error)
-    //     await logseq.UI.showMsg('Data Sync Failed')
-    //   })
+    // if FromAccount then return propertiesTextValues
+    const xx = x.map((y) => y.propertiesTextValues).map(toFromAccount)
+
+    // map each of them to api properties
+
+    const isEqualToContent = isEquals(block.content)
+    const payload: Payload = {
+      categories: isEqualToContent('category') ? c : undefined,
+      fromAccounts: isEqualToContent('fromAccount') ? xx : undefined
+    }
+    debugger
+
+    // request payload
+    await postRequest(payload)
+      .then(async ({ message }) => {
+        if (message !== 'Webhook trigger fired successfully') throw new Error(message)
+        await logseq.UI.showMsg('Data Posted successfully')
+      })
+      .catch(async (error) => {
+        console.error(error)
+        await logseq.UI.showMsg('Data Sync Failed')
+      })
   })
 }
 
