@@ -4,21 +4,21 @@ import { type BlockEntity } from '@logseq/libs/dist/LSPlugin'
 import { postRequest, type Payload } from './api'
 import { isEquals, toCategories, toFromAccount } from './domain'
 import { toBlocks } from './logseq-helper'
-import { debug, error, getCurrentBlock } from './util'
+import { getCurrentBlock, logLabel } from './util'
 
 export const main = (): void => {
   logseq.Editor.registerSlashCommand('0 Test Plugin', async () => {
     const block = await getCurrentBlock()
     if (block == null) {
-      error('No Block found')
+      console.error(logLabel, 'No Block found')
       return
     }
     if (block?.children == null) {
-      error('No children found')
+      console.error(logLabel, 'No children found')
       return
     }
 
-    debug(`Parent ${block.content}`)
+    console.debug(logLabel, `Parent ${block.content}`)
 
     // Block
     // get children
@@ -40,17 +40,18 @@ export const main = (): void => {
       fromAccounts: isEqualToContent('fromAccount') ? xx : undefined
     }
     debugger
+    console.log(payload)
 
     // request payload
-    await postRequest(payload)
-      .then(async ({ message }) => {
-        if (message !== 'Webhook trigger fired successfully') throw new Error(message)
-        await logseq.UI.showMsg('Data Posted successfully')
-      })
-      .catch(async (error) => {
-        console.error(error)
-        await logseq.UI.showMsg('Data Sync Failed')
-      })
+    // await postRequest(payload)
+    //   .then(async ({ message }) => {
+    //     if (message !== 'Webhook trigger fired successfully') throw new Error(message)
+    //     await logseq.UI.showMsg('Data Posted successfully')
+    //   })
+    //   .catch(async (error) => {
+    //     console.error(error)
+    //     await logseq.UI.showMsg('Data Sync Failed')
+    //   })
   })
 }
 
@@ -58,6 +59,6 @@ export const main = (): void => {
 logseq
   .ready(main)
   .then(() => {
-    debug('Plugin Ready')
+    console.debug(logLabel, 'Plugin Ready')
   })
   .catch(console.error)

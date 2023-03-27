@@ -1,15 +1,7 @@
 import { type BlockEntity } from '@logseq/libs/dist/LSPlugin'
 import * as R from 'ramda'
 
-const logLabel = 'expense-tracker'
-
-export const debug = (x: any): void => {
-  console.debug(logLabel, x)
-}
-
-export const error = (x: any): void => {
-  console.error(logLabel, x)
-}
+export const logLabel = 'expense-tracker'
 
 export const getCurrentBlock = async (): Promise<BlockEntity | null> => {
   const block = await logseq.Editor.getCurrentBlock()
