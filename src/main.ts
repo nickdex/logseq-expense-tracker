@@ -27,7 +27,7 @@ export const main = (): void => {
     const x = toBlocks(block.children as BlockEntity[])
 
     // if category then return content
-    const c = toCategories(x.map((y) => y.content))
+    const c = x.map((y) => y.content).map(toCategories)
 
     // if FromAccount then return propertiesTextValues
     const xx = x.map((y) => y.propertiesTextValues).map(toFromAccount)
