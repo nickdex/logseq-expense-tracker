@@ -16,8 +16,11 @@
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "lint": "pnpm format && eslint --fix src/**",
-    "format": "prettier --write src/ test/"
+    "lint": "eslint src test",
+    "lint:fix": "pnpm lint --fix",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
+    "format": "pnpm run prettier:fix && pnpm run lint:fix"
   },
   "devDependencies": {
     "@types/node": "^18.15.9",
@@ -44,5 +47,12 @@
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
   }
 }

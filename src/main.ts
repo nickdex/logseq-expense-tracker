@@ -1,20 +1,28 @@
 import '@logseq/libs'
+
 import { type BlockEntity } from '@logseq/libs/dist/LSPlugin'
 
 import { postRequest, type Payload } from './api'
+
 import { isEquals, toCategories, toFromAccount } from './domain'
+
 import { toBlocks } from './logseq-helper'
+
 import { getCurrentBlock, logLabel } from './util'
 
 export const main = (): void => {
   logseq.Editor.registerSlashCommand('0 Test Plugin', async () => {
     const block = await getCurrentBlock()
+
     if (block == null) {
       console.error(logLabel, 'No Block found')
+
       return
     }
+
     if (block?.children == null) {
       console.error(logLabel, 'No children found')
+
       return
     }
 
@@ -30,16 +38,19 @@ export const main = (): void => {
     const c = x.map((y) => y.content).map(toCategories)
 
     // if FromAccount then return propertiesTextValues
-    const xx = x.map((y) => y.propertiesTextValues).map(toFromAccount)
+    const xx = x.map(toFromAccount)
 
     // map each of them to api properties
 
     const isEqualToContent = isEquals(block.content)
+
     const payload: Payload = {
       categories: isEqualToContent('category') ? c : undefined,
-      fromAccounts: isEqualToContent('fromAccount') ? xx : undefined
+      fromAccounts: isEqualToContent('fromAccount') ? xx : undefined,
     }
+
     debugger
+
     console.log(payload)
 
     // request payload

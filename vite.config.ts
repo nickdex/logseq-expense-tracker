@@ -4,10 +4,10 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   base: './',
   test: {
-    reporters: ['html']
+    reporters: ['html'],
   },
   build: {
     target: 'esnext',
-    sourcemap: true
-  }
+    sourcemap: true,
+  },
 })
