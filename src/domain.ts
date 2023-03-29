@@ -9,36 +9,63 @@ import {
   pipe,
   reduce,
   replace,
+  split,
   toLower,
-  toPairs
+  toPairs,
+  toUpper,
+  trim,
 } from 'ramda'
 
-import { cleanUpString, convertToSnakeCase } from './util'
+import { removeBraces, convertToSnakeCase } from './util'
 
-const capitalizeFirstLetter = (e: string): string => e.replace(/^\w/, (c) => c.toUpperCase())
-const escapeNewline = (s: string): string => s.replace(/\n/g, '\\n')
+const capitalizeFirstLetter = (e: string): string =>
+  e.replace(/^\w/, (c) => c.toUpperCase())
+
+export const clean = pipe(
+  split('\n'),
+  (x: string[]) => x[0],
+  replace(/([\w\s-]+)[^\w\s-].*/, '$1'),
+  trim,
+  replace(/\n/g, '')
+)
 
 export const toCamelCase = pipe(
-  escapeNewline,
-  replace(/([\w\s-]+).*/, '$1'),
   match(/[a-zA-Z0-9]+/g),
   map(toLower),
   reduce((acc: string, e: string) => acc + capitalizeFirstLetter(e), ''),
   (s: string) => s.replace(/^\w/, (c: string) => c.toLowerCase())
 )
 
-export const isEquals = (content: string): ((x: string) => boolean) => equals(toCamelCase(content))
+export const sanitizedBlockContent = pipe(clean, toUpper)
 
-export const toCategories = (childrenContent: string): Record<string, string> => ({
-  category_name: childrenContent
+export const isEquals = (content: string): ((x: string) => boolean) =>
+  equals(pipe(clean, toCamelCase)(content))
+
+export const toCategories = (
+  childrenContent: string
+): Record<string, string> => ({
+  category_name: childrenContent,
   // category_icon:
 })
 
-export const toFromAccount = (childrenContent: Record<string, string>): Record<string, string> =>
-  pick(
-    ['account_name', 'description', 'account_type', 'account_icon', 'counterparty', 'last_digits'],
-    childrenContent
-  )
+export const toFromAccount = (block: Block): Record<string, string> => {
+  const { content, propertiesTextValues } = block
+
+  return {
+    ...pick(
+      [
+        'account_name',
+        'description',
+        'account_type',
+        'account_icon',
+        'counterparty',
+        'last_digits',
+      ],
+      propertiesTextValues
+    ),
+    ...{ account_name: sanitizedBlockContent(content) },
+  }
+}
 
 export interface Block {
   content: string
@@ -56,10 +83,12 @@ export interface Block {
 
 const transformEntry = ([key, value]: [string, string]): [string, string] => [
   convertToSnakeCase(key),
-  cleanUpString(value)
+  removeBraces(value),
 ]
 
-export const transformProperties = (originalObject: Record<string, string>): Record<string, string> =>
+export const transformProperties = (
+  originalObject: Record<string, string>
+): Record<string, string> =>
   // @ts-expect-error: Use conditional typings
   compose(
     fromPairs,
